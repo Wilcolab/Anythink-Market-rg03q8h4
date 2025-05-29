@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+
+body {
+    font-family: 'Architects Daughter', cursive;
+    background: #fff;
+    color: #222;
+}
+.app-title {
+    font-family: 'Architects Daughter', cursive;
+    text-align: center;
+    font-size: 2.5rem;
+    margin-top: 1rem;
+}
+.center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.image-preview-container {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+}
+.image-preview {
+    width: 350px;
+    height: 350px;
+    border-radius: 2rem;
+    border: 3px solid #222;
+    background: #fff;
+    object-fit: contain;
+}
+.arrow-btn {
+    background: none;
+    border: none;
+    font-size: 3rem;
+    cursor: pointer;
+    margin: 0 1.5rem;
+    user-select: none;
+}
+.filter-buttons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+.filter-btn {
+    font-family: inherit;
+    border: 2px solid #222;
+    border-radius: 1rem;
+    padding: 0.75rem 2rem;
+    background: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.filter-btn.selected, .filter-btn:focus {
+    background: #b3dafe;
+    border-color: #3b82f6;
+}
+#download-btn {
+    margin-bottom: 1.5rem;
+    font-family: inherit;
+    border: 2px solid #222;
+    border-radius: 0.7rem;
+    padding: 0.5rem 2rem;
+    background: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background: rgba(0,0,0,0.3);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 2rem 3rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+    text-align: center;
+}
+.close-modal {
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-top: -1rem;
+    margin-right: -1rem;
+} 
