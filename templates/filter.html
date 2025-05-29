@@ -1,186 +1,208 @@
 {% extends "base.html" %}
 
 {% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
 <style>
-    .preview-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-    
-    .filter-active {
-        border-color: var(--primary-color);
-        background-color: rgba(99, 102, 241, 0.1);
-    }
-    
-    .download-container {
+    .app-title {
+        font-family: 'Architects Daughter', cursive;
         text-align: center;
+        font-size: 2.5rem;
         margin-top: 1rem;
+    }
+    .center-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .image-preview-container {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+    }
+    .image-preview {
+        width: 350px;
+        height: 350px;
+        border-radius: 2rem;
+        border: 3px solid #222;
+        background: #fff;
+        object-fit: contain;
+    }
+    .arrow-btn {
+        background: none;
+        border: none;
+        font-size: 3rem;
+        cursor: pointer;
+        margin: 0 1.5rem;
+        user-select: none;
+    }
+    .filter-buttons-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    .filter-btn {
+        font-family: inherit;
+        border: 2px solid #222;
+        border-radius: 1rem;
+        padding: 0.75rem 2rem;
+        background: #fff;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .filter-btn.selected, .filter-btn:focus {
+        background: #b3dafe;
+        border-color: #3b82f6;
+    }
+    #download-btn {
+        margin-bottom: 1.5rem;
+        font-family: inherit;
+        border: 2px solid #222;
+        border-radius: 0.7rem;
+        padding: 0.5rem 2rem;
+        background: #fff;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    /* Modal styles */
+    .modal {
         display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        background: rgba(0,0,0,0.3);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background: #fff;
+        padding: 2rem 3rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+    .close-modal {
+        float: right;
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-top: -1rem;
+        margin-right: -1rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2>Image Filters</h2>
-    <div class="preview-container">
-        <div class="preview-box">
-            <div class="preview-title">Original</div>
-            <img src="{{ image_data }}" alt="Original image" class="preview-image" id="original-image">
-        </div>
-        <div class="preview-box">
-            <div class="preview-title">Filtered: <span id="current-filter">None</span></div>
-            <img src="{{ image_data }}" alt="Filtered image" class="preview-image" id="filtered-image">
-            <div class="download-container" id="download-container">
-                <a href="#" class="button" id="download-button">Download</a>
-            </div>
-        </div>
+<h1 class="app-title">Image Filter App</h1>
+<div class="center-container">
+    <button id="download-btn">Download</button>
+    <div class="image-preview-container">
+        <button id="arrow-left" class="arrow-btn">&#60;</button>
+        <img id="main-image" src="{{ image_data }}" class="image-preview" />
+        <button id="arrow-right" class="arrow-btn">&#62;</button>
     </div>
-    
-    <div>
-        <input type="hidden" name="image_id" id="image-id" value="{{ image_id }}">
-        
-        <div class="filter-container">
-            <div class="filter-option" data-filter="none">
-                <div class="filter-name">Original</div>
-                <div class="filter-description">No filter applied</div>
-            </div>
-            {% for filter_id, filter_name in filters.items() %}
-            <div class="filter-option" data-filter="{{ filter_id }}">
-                <div class="filter-name">{{ filter_id|capitalize }}</div>
-                <div class="filter-description">{{ filter_name }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="button-container">
-            <a href="/" class="button button-secondary">Upload New Image</a>
-        </div>
-        
-        <div class="loading" id="loading">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 6v6l4 2"></path>
-            </svg>
-            <span>Processing Image...</span>
-        </div>
+    <div class="filter-buttons-row">
+        <button class="filter-btn" data-filter="none">Original</button>
+        {% for filter_id, filter_name in filters.items() %}
+            <button class="filter-btn" data-filter="{{ filter_id }}">{{ filter_name }}</button>
+        {% endfor %}
     </div>
 </div>
+<!-- Upload Modal -->
+<div id="upload-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-upload-modal">&times;</span>
+        <h2>Upload Image</h2>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required />
+            <br><br>
+            <button type="submit" class="filter-btn">Upload</button>
+        </form>
+    </div>
+</div>
+<button id="open-upload-modal" class="filter-btn" style="margin-top:2rem;">Upload New Image</button>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterOptions = document.querySelectorAll('.filter-option');
-        const imageId = document.getElementById('image-id').value;
-        const filteredImage = document.getElementById('filtered-image');
-        const originalImage = document.getElementById('original-image');
-        const currentFilterText = document.getElementById('current-filter');
-        const loadingIndicator = document.getElementById('loading');
-        const downloadContainer = document.getElementById('download-container');
-        const downloadButton = document.getElementById('download-button');
-        
-        let currentImageData = null;
-        let currentFilterName = 'None';
-        
-        // Hide loading indicator initially
-        loadingIndicator.style.display = 'none';
-        
-        filterOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                // Remove active class from all options
-                filterOptions.forEach(opt => opt.classList.remove('filter-active'));
-                
-                // Add active class to selected option
-                this.classList.add('filter-active');
-                
-                const selectedFilter = this.getAttribute('data-filter');
-                currentFilterName = selectedFilter === 'none' ? 'None' : selectedFilter.charAt(0).toUpperCase() + selectedFilter.slice(1);
-                currentFilterText.textContent = currentFilterName;
-                
-                // If "none" is selected, show the original image
-                if (selectedFilter === 'none') {
-                    filteredImage.src = originalImage.src;
-                    downloadContainer.style.display = 'none';
-                    currentImageData = null;
-                    return;
-                }
-                
-                // Show loading indicator
-                loadingIndicator.style.display = 'flex';
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('image_id', imageId);
-                formData.append('selected_filter', selectedFilter);
-                
-                // Send request to apply filter
-                fetch('/api/apply-filter', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Update filtered image source with base64 data
-                    filteredImage.src = data.image_data;
-                    currentImageData = data.image_data;
-                    
-                    // Show download button
-                    downloadContainer.style.display = 'block';
-                    
-                    // Hide loading indicator
-                    loadingIndicator.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error applying filter:', error);
-                    loadingIndicator.style.display = 'none';
-                });
-            });
+    // Modal logic
+    const uploadModal = document.getElementById('upload-modal');
+    const openUploadModalBtn = document.getElementById('open-upload-modal');
+    const closeUploadModalBtn = document.getElementById('close-upload-modal');
+    openUploadModalBtn.onclick = () => uploadModal.style.display = 'flex';
+    closeUploadModalBtn.onclick = () => uploadModal.style.display = 'none';
+    window.onclick = function(event) {
+        if (event.target === uploadModal) uploadModal.style.display = 'none';
+    };
+    // Upload form submit
+    document.getElementById('upload-form').onsubmit = function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.open();
+            document.write(html);
+            document.close();
         });
-        
-        // Handle download button click
-        downloadButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            if (!currentImageData) return;
-            
-            // Create a form for the download POST request
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/download';
-            form.style.display = 'none';
-            
-            // Add the image data
-            const imageDataInput = document.createElement('input');
-            imageDataInput.type = 'hidden';
-            imageDataInput.name = 'image_data';
-            imageDataInput.value = currentImageData;
-            form.appendChild(imageDataInput);
-            
-            // Add the filter name
-            const filterNameInput = document.createElement('input');
-            filterNameInput.type = 'hidden';
-            filterNameInput.name = 'filter_name';
-            filterNameInput.value = currentFilterName.toLowerCase();
-            form.appendChild(filterNameInput);
-            
-            // Submit the form
-            document.body.appendChild(form);
-            form.submit();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(form);
-            }, 1000);
-        });
-        
-        // Select "Original" by default
-        const originalOption = document.querySelector('.filter-option[data-filter="none"]');
-        if (originalOption) {
-            originalOption.classList.add('filter-active');
+    };
+    // Filter cycling logic
+    const filterBtns = Array.from(document.querySelectorAll('.filter-btn'));
+    let currentIndex = 0;
+    function updateFilter(index) {
+        filterBtns.forEach(btn => btn.classList.remove('selected'));
+        filterBtns[index].classList.add('selected');
+        const selectedFilter = filterBtns[index].dataset.filter;
+        if (selectedFilter === 'none') {
+            document.getElementById('main-image').src = '{{ image_data }}';
+            return;
         }
+        // Call your filter API here
+        const imageId = '{{ image_id }}';
+        const formData = new FormData();
+        formData.append('image_id', imageId);
+        formData.append('selected_filter', selectedFilter);
+        fetch('/api/apply-filter', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('main-image').src = data.image_data;
+        });
+    }
+    document.getElementById('arrow-left').onclick = () => {
+        currentIndex = (currentIndex - 1 + filterBtns.length) % filterBtns.length;
+        updateFilter(currentIndex);
+    };
+    document.getElementById('arrow-right').onclick = () => {
+        currentIndex = (currentIndex + 1) % filterBtns.length;
+        updateFilter(currentIndex);
+    };
+    filterBtns.forEach((btn, idx) => {
+        btn.onclick = () => {
+            currentIndex = idx;
+            updateFilter(currentIndex);
+        };
     });
+    // Download logic
+    document.getElementById('download-btn').onclick = function() {
+        const imgSrc = document.getElementById('main-image').src;
+        const link = document.createElement('a');
+        link.href = imgSrc;
+        link.download = 'filtered_image.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 </script>
 {% endblock %} 
