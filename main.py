@@ -265,6 +265,7 @@ async def api_apply_filter(
             for px in range(width):
                 r, g, b = rgb_img.getpixel((px, py))
                 pixels[px, py] = (255 - r, 255 - g, 255 - b)
+
         
         filtered_img = rgb_img
     elif selected_filter == "sepia":
@@ -336,4 +337,4 @@ async def download_image(
     )
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=31337, reload=True) 
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True) 
