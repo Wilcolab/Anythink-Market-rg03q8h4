@@ -151,9 +151,10 @@ async def api_apply_filter(
             for px in range(width):
                 r, g, b = rgb_img.getpixel((px, py))
                 
-                tr = 25 - r
-                tg = 25 - g
-                tb = 25 - b
+                # Proper inversion: subtract from 255
+                tr = 255 - r
+                tg = 255 - g
+                tb = 255 - b
                 
                 pixels[px, py] = (tr, tg, tb)
         
@@ -225,4 +226,4 @@ async def download_image(
     )
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=31337, reload=True) 
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True) 
