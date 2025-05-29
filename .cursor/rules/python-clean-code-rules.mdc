@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+When modifying or creating Python code, follow these guidelines:
+1. Extract complex logic into separate, well-named functions
+2. Keep functions focused on a single responsibility
+3. Add descriptive docstrings to all functions explaining parameters and return values
+4. Use meaningful variable names that reflect their purpose
+5. Group related functions into separate modules or classes when appropriate
+6. Add error handling for edge cases
+
