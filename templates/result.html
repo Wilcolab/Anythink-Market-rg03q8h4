@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="selected-filter">{{ filter_name }}</div>
+    <div class="preview-container">
+        <div class="preview-box">
+            <div class="preview-title">Original Image</div>
+            <img src="{{ original_image }}" alt="Original image" class="preview-image">
+        </div>
+        
+        <div class="preview-box">
+            <div class="preview-title">Filtered Image</div>
+            <img src="{{ filtered_image }}" alt="Filtered image" class="preview-image">
+        </div>
+    </div>
+    
+    <div class="button-container">
+        <a href="/" class="button button-secondary">Start Over</a>
+        <a href="/apply-filter?image_name={{ image_name }}" class="button button-secondary">Try Another Filter</a>
+        <a href="{{ filtered_image }}" download class="button">Download Image</a>
+    </div>
+</div>
+{% endblock %} 
